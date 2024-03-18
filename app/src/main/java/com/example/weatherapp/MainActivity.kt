@@ -13,6 +13,7 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
+import com.example.weatherapp.utils.Constants
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -60,8 +61,18 @@ class MainActivity : AppCompatActivity() {
         mFusedLocationClient.requestLocationUpdates(locationRequest, object: LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 Toast.makeText(this@MainActivity, "latitude: ${locationResult.lastLocation?.latitude}\nlongitude: ${locationResult.lastLocation?.longitude}", Toast.LENGTH_SHORT).show()
+
+                getLocationWeatherDetails()
             }
         }, Looper.myLooper())
+    }
+
+    private fun getLocationWeatherDetails(){
+        if (Constants.isNetworkAvailable(this)){
+            Toast.makeText(this, "There is internet connection", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "There's no internet connection", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun isLocationEnabled() : Boolean {
