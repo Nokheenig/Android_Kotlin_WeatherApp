@@ -1,4 +1,4 @@
-package com.example.weatherapp
+package com.example.weatherapp.models
 
 class Sys (
     val type: Int,
