@@ -28,6 +28,10 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 class MainActivity : AppCompatActivity() {
     private val REQUEST_LOCATION_CODE = 112387469
@@ -68,7 +72,7 @@ class MainActivity : AppCompatActivity() {
         ).build()
         mFusedLocationClient.requestLocationUpdates(locationRequest, object: LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
-                Toast.makeText(this@MainActivity, "latitude: ${locationResult.lastLocation?.latitude}\nlongitude: ${locationResult.lastLocation?.longitude}", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this@MainActivity, "latitude: ${locationResult.lastLocation?.latitude}\nlongitude: ${locationResult.lastLocation?.longitude}", Toast.LENGTH_SHORT).show()
 
                 getLocationWeatherDetails(
                     locationResult.lastLocation?.latitude!!,
@@ -100,17 +104,17 @@ class MainActivity : AppCompatActivity() {
                     if (response.isSuccessful){
                         val weather = response.body()
                         Log.d("WEATHER", weather.toString())
-                        Toast.makeText(this@MainActivity, "${weather}", Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(this@MainActivity, "${weather}", Toast.LENGTH_SHORT).show()
 
                         for (i in weather?.weather?.indices!!){
-                            findViewById<TextView>(R.id.text_view_sunset).text = weather.sys.sunset.toString()
-                            findViewById<TextView>(R.id.text_view_sunrise).text = weather.sys.sunrise.toString()
+                            findViewById<TextView>(R.id.text_view_sunset).text = convertTime(weather.sys.sunset.toLong())
+                            findViewById<TextView>(R.id.text_view_sunrise).text = convertTime(weather.sys.sunrise.toLong())
                             findViewById<TextView>(R.id.text_view_status).text = weather.weather[i].description
                             findViewById<TextView>(R.id.text_view_address).text = weather.name
-                            findViewById<TextView>(R.id.text_view_updated_at).text = weather.dt.toString()
-                            findViewById<TextView>(R.id.text_view_temp_max).text = weather.main.tempMax.toString()
-                            findViewById<TextView>(R.id.text_view_temp_min).text = weather.main.tempMin.toString()
-                            findViewById<TextView>(R.id.text_view_temp).text = weather.main.temperature.toString()
+                            findViewById<TextView>(R.id.text_view_updated_at).text = convertTime(weather.dt.toLong())
+                            findViewById<TextView>(R.id.text_view_temp_max).text = weather.main.tempMax.toString() + "°"
+                            findViewById<TextView>(R.id.text_view_temp_min).text = weather.main.tempMin.toString() + "°"
+                            findViewById<TextView>(R.id.text_view_temp).text = weather.main.temperature.toString() + "°"
                             findViewById<TextView>(R.id.text_view_humidity).text = weather.main.humidity.toString()
                             findViewById<TextView>(R.id.text_view_pressure).text = weather.main.pressure.toString()
                             findViewById<TextView>(R.id.text_view_wind).text = weather.wind.speed.toString()
@@ -129,6 +133,13 @@ class MainActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "There's no internet connection", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun convertTime(time: Long) : String {
+        val date = Date(time*1000L)
+        val timeFormatted = SimpleDateFormat("HH:mm", Locale.UK)
+        timeFormatted.timeZone = TimeZone.getDefault()
+        return timeFormatted.format(date)
     }
 
     private fun isLocationEnabled() : Boolean {
